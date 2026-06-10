@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HexSoaiAnOS v1.0 - Hệ Điều Hành Đỉnh Cao</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+
+        /* Màn hình Boot (Khởi động) */
+        #boot-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #050505;
+            color: #00ff00;
+            font-family: monospace;
+            padding: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        /* Màn hình chính */
+        #desktop {
+            width: 100%;
+            height: calc(100% - 45px);
+            background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1920') no-repeat center center/cover;
+            position: relative;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-content: flex-start;
+            flex-wrap: wrap;
+        }
+
+        /* Icon trên desktop */
+        .desktop-icon {
+            width: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            color: white;
+            text-shadow: 1px 1px 3px black;
+            font-size: 13px;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .desktop-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .desktop-icon img {
+            width: 45px;
+            height: 45px;
+            margin-bottom: 5px;
+        }
+
+        /* Cửa sổ ứng dụng */
+        .window {
+            position: absolute;
+            top: 10%;
+            left: 25%;
+            width: 500px;
+            height: 350px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .window-header {
+            background: #202020;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+        }
+
+        .window-title {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: #ff5f56;
+            border: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .window-content {
+            padding: 15px;
+            flex: 1;
+            overflow-auto: auto;
+            color: #333;
+        }
+
+        /* Thanh Taskbar phía dưới */
+        #taskbar {
+            width: 100%;
+            height: 45px;
+            background: rgba(20, 20, 20, 0.85);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            color: white;
+            z-index: 999;
+        }
+
+        #start-btn {
+            background: linear-gradient(45deg, #ff00cc, #3333ff);
+            border: none;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #start-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Màn hình Xanh Chết Chóc (BSOD) của HexSoaiAnOS */
+        #bsod {
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: #0000aa;
+            color: white;
+            font-family: monospace;
+            padding: 50px;
+            display: none;
+            z-index: 10000;
+            font-size: 18px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="boot-screen">
+        <div id="boot-log"></div>
+    </div>
+
+    <div id="desktop">
+        <div class="desktop-icon" onclick="openWindow('win-secret')">
+            <img src="https://cdn-icons-png.flaticon.com/512/716/716858.png" alt="Folder">
+            <div>File Bí Mật</div>
+        </div>
+
+        <div class="desktop-icon" onclick="openWindow('win-miner')">
+            <img src="https://cdn-icons-png.flaticon.com/512/2172/2172828.png" alt="Coin">
+            <div>HexCoin Miner</div>
+        </div>
+
+        <div class="desktop-icon" onclick="triggerBsod()">
+            <img src="https://cdn-icons-png.flaticon.com/512/564/564619.png" alt="Danger">
+            <div>Đừng Bấm Vào</div>
+        </div>
+    </div>
+
+    <div id="win-secret" class="window">
+        <div class="window-header">
+            <span class="window-title">Top Secret.txt</span>
+            <button class="close-btn" onclick="closeWindow('win-secret')"></button>
+        </div>
+        <div class="window-content">
+            <h3>Chào mừng bạn đã cài đặt thành công HexSoaiAnOS!</h3>
+            <br>
+            <p>Hệ điều hành này được tối ưu hóa bằng AI chạy bằng cơm, cam kết:</p>
+            <ul>
+                <li>Không ngốn RAM (vì có cái gì đâu mà ngốn).</li>
+                <li>Bảo mật tuyệt đối (hacker nhìn vào cũng bất lực đi ra).</li>
+                <li>Tự động tối ưu hóa ví tiền của bạn về 0đ.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="win-miner" class="window">
+        <div class="window-header">
+            <span class="window-title">HexCoin Cloud Miner v9.9</span>
+            <button class="close-btn" onclick="closeWindow('win-miner')"></button>
+        </div>
+        <div class="window-content" style="background: #222; color: #00ff00; font-family: monospace;">
+            <p>[+] Đang kết nối tới ví HexSoaiAn...</p>
+            <p>[+] Đang dùng 100% CPU của bạn để đào coin...</p>
+            <h2 style="margin-top: 20px; text-align: center;">Đã đào được: <span id="coin-count">0.0000</span> HXA</h2>
+        </div>
+    </div>
+
+    <div id="taskbar">
+        <button id="start-btn" onclick="alert('Menu Start đang được bảo trì để cập nhật tính năng thu phí!')">HexStart</button>
+        <div id="clock">12:00 PM</div>
+    </div>
+
+    <div id="bsod">
+        <h2>:( HexSoaiAnOS đã bị sập vì bạn quá đẹp trai.</h2>
+        <br>
+        <p>Hệ thống phát hiện mức độ đẹp trai vượt quá giới hạn cho phép của CPU (Error_Too_Handsome_Exception).</p>
+        <p>Nếu đây là lần đầu tiên bạn thấy màn hình này, hãy đi soi gương lại xem.</p>
+        <br>
+        <p>Đang thu thập dữ liệu lỗi để gửi cho Sếp Tổng (0% hoàn thành)...</p>
+        <p style="margin-top: 50px; font-size: 14px;">Bấm F5 hoặc Tải lại trang để "cài lại Win".</p>
+    </div>
+
+    <script>
+        // 1. Giả lập quá trình Boot (Khởi động)
+        const bootLog = document.getElementById('boot-log');
+        const logs = [
+            "HexSoaiAnOS BIOS v4.20...",
+            "Checking RAM... 64KB OK (Quá đủ cho một huyền thoại)",
+            "Detecting Graphics... VGA Giả Lập Cực Nét",
+            "Loading HexSoaiAn Kernel...",
+            "Bypassing FBI Firewall... SUCCESS",
+            "Bypassing NASA Mainframe... SUCCESS",
+            "Tối ưu hóa thuật toán lùa gà...",
+            "Hoàn tất! Đang vào màn hình chính..."
+        ];
+
+        let logIndex = 0;
+        function printLog() {
+            if (logIndex < logs.length) {
+                bootLog.innerHTML += logs[logIndex] + "<br>";
+                logIndex++;
+                setTimeout(printLog, 400); // Mỗi dòng hiện sau 400ms
+            } else {
+                setTimeout(() => {
+                    document.getElementById('boot-screen').style.display = 'none';
+                }, 800);
+            }
+        }
+        window.onload = printLog;
+
+        // 2. Đồng hồ ở Taskbar
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString();
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // 3. Đóng/Mở cửa sổ ứng dụng
+        function openWindow(id) {
+            document.getElementById(id).style.display = 'flex';
+            // Đào coin chạy số nếu mở cửa sổ đào coin
+            if(id === 'win-miner') {
+                startMining();
+            }
+        }
+        function closeWindow(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        // 4. Giả lập đào coin chạy số cho vui
+        let coin = 0;
+        let minerInterval;
+        function startMining() {
+            if(!minerInterval) {
+                minerInterval = setInterval(() => {
+                    coin += Math.random() * 0.1;
+                    document.getElementById('coin-count').innerText = coin.toFixed(4);
+                }, 200);
+            }
+        }
+
+        // 5. Kích hoạt màn hình xanh (BSOD)
+        function triggerBsod() {
+            document.getElementById('bsod').style.display = 'block';
+        }
+
+        // 6. Tính năng kéo thả cửa sổ cơ bản
+        document.querySelectorAll('.window').forEach(win => {
+            const header = win.querySelector('.window-header');
+            let isDragging = false;
+            let currentX, currentY, initialX, initialY;
+
+            header.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                initialX = e.clientX - win.offsetLeft;
+                initialY = e.clientY - win.offsetTop;
+                win.style.zindex = 100; // Đưa lên trên cùng khi tương tác
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                    win.style.left = currentX + 'px';
+                    win.style.top = currentY + 'px';
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+        });
+    </script>
+</body>
+</html>
